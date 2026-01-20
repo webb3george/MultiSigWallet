@@ -10,9 +10,6 @@ contract VaultMultisig {
     /// @notice The number of transfers executed
     uint256 public transfersCount;
 
-    /// @notice The number of contract operations executed
-    uint256 public operationsCount;
-
     /// @notice The access manager
     AccessManager public accessManager;
 
@@ -33,27 +30,8 @@ contract VaultMultisig {
         mapping(address => bool) approved;
     }
 
-    /// @dev The struct is used to store the details of a contract operation
-    /// @param target The target contract address
-    /// @param data The encoded function call data
-    /// @param description Human readable description
-    /// @param approvals The number of approvals received
-    /// @param executed Whether the operation has been executed
-    /// @param approved The mapping of signers to their approval status
-    struct Operation {
-        address target;
-        bytes data;
-        string description;
-        uint256 approvals;
-        bool executed;
-        mapping(address => bool) approved;
-    }
-
     /// @notice The mapping of transfer IDs to transfer details
     mapping(uint256 => Transfer) private transfers;
-
-    /// @notice The mapping of operation IDs to operation details
-    mapping(uint256 => Operation) private operations;
 
     /// @notice The mapping for verification that address is a signer
     mapping(address => bool) private multiSigSigners;
@@ -83,10 +61,6 @@ contract VaultMultisig {
     /// @param transferId The ID of the transfer
     error TransferIsAlreadyExecuted(uint256 transferId);
 
-    /// @notice Checks that the operation is not already executed
-    /// @param operationId The ID of the operation
-    error OperationIsAlreadyExecuted(uint256 operationId);
-
     /// @notice Checks that the signer is already approved
     /// @param signer The address of the signer
     error SignerAlreadyApproved(address signer);
@@ -95,26 +69,12 @@ contract VaultMultisig {
     /// @param transferId The ID of the transfer
     error TransferFailed(uint256 transferId);
 
-    /// @notice Checks that the operation failed
-    /// @param operationId The ID of the operation
-    error OperationFailed(uint256 operationId);
-
     /// @notice Checks that quorum was reached for transfer
     /// @param transferId The ID of the transfer
     error QuorumHasNotBeenReached(uint256 transferId);
 
-    /// @notice Checks that quorum was reached for operation
-    /// @param operationId The ID of the operation
-    error OperationQuorumHasNotBeenReached(uint256 operationId);
-
     /// @notice Checks that the signer is a multisig admin
     error InvalidMultisigAdmin();
-
-    /// @notice Checks that target address is not zero
-    error InvalidTarget();
-
-    /// @notice Checks that operation data is not empty
-    error InvalidOperationData();
 
     /// @notice Emitted when a transfer is initiated
     event TransferInitiated(uint256 indexed transferId, address indexed to, uint256 amount);
@@ -127,18 +87,6 @@ contract VaultMultisig {
     /// @notice Emitted when a transfer is executed
     /// @param transferId The ID of the transfer
     event TransferExecuted(uint256 indexed transferId);
-
-    /// @notice Emitted when a contract operation is initiated
-    event OperationInitiated(uint256 indexed operationId, address indexed target, string description);
-
-    /// @notice Emitted when an operation is approved
-    /// @param operationId The ID of the operation
-    /// @param approver The address of the approver
-    event OperationApproved(uint256 indexed operationId, address indexed approver);
-
-    /// @notice Emitted when an operation is executed
-    /// @param operationId The ID of the operation
-    event OperationExecuted(uint256 indexed operationId);
 
     /// @notice Emitted when the multisig signers are updated
     event MultiSigSignersUpdated();
@@ -261,6 +209,8 @@ contract VaultMultisig {
         emit TransferApproved(_transferId, msg.sender);
     }
 
+    /// @notice Executed transfer
+    /// @param _transferId The ID of the transfer
     function executeTransfer(uint256 _transferId) external onlyMultisigSigner {
         Transfer storage transfer = transfers[_transferId];
         if (transfer.approvals < quorum) revert QuorumHasNotBeenReached(_transferId);
