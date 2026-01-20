@@ -9,7 +9,6 @@ contract AccessManagerTest is Test {
     AccessManager public accessManager;
     address public admin;
     address public multisigAdmin1;
-    address public eip712Swapper1;
     address public nonAdmin;
 
     function setUp() public {
