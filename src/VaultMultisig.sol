@@ -175,7 +175,7 @@ contract VaultMultisig {
 
         uint256 signersArrayLength = _signers.length;
 
-        for (uint256 i = 0; i < signersArrayLength; ) {
+        for (uint256 i = 0; i < signersArrayLength;) {
             multiSigSigners[_signers[i]] = true;
 
             unchecked {
@@ -196,17 +196,17 @@ contract VaultMultisig {
 
         uint256 currentMultiSigSignersLength = currentMultiSigSigners.length;
 
-        for (uint256 i = 0; i < currentMultiSigSignersLength; ) {
+        for (uint256 i = 0; i < currentMultiSigSignersLength;) {
             multiSigSigners[currentMultiSigSigners[i]] = false;
 
-            unchecked{
+            unchecked {
                 ++i;
             }
         }
 
         uint256 signersArrayLength = _signers.length;
 
-        for (uint256 i = 0; i < signersArrayLength; ) {
+        for (uint256 i = 0; i < signersArrayLength;) {
             multiSigSigners[_signers[i]] = true;
 
             unchecked {
