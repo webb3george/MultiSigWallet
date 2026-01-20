@@ -168,13 +168,19 @@ contract VaultMultisig {
     /// @notice Initializes the multisig contract
     /// @param _signers The array of multisig signers
     /// @param _quorum The number of signatures required to execute a transaction
-    constructor(address[] memory _signers, uint256 _quorum, address _accessManager) {
+    constructor(address[] memory _signers, uint256 _quorum, address _accessManager) payable {
         if (_signers.length == 0) revert SignersArrayCannotBeEmpty();
         if (_quorum > _signers.length) revert QuorumGreaterThanSigners();
         if (_quorum == 0) revert QuorumCannotBeZero();
 
-        for (uint256 i = 0; i < _signers.length; i++) {
+        uint256 signersArrayLength = _signers.length;
+
+        for (uint256 i = 0; i < signersArrayLength;) {
             multiSigSigners[_signers[i]] = true;
+
+            unchecked {
+                ++i;
+            }
         }
 
         currentMultiSigSigners = _signers;
@@ -188,12 +194,24 @@ contract VaultMultisig {
         if (_signers.length == 0) revert SignersArrayCannotBeEmpty();
         if (_signers.length < quorum) revert QuorumGreaterThanSigners();
 
-        for (uint256 i = 0; i < currentMultiSigSigners.length; i++) {
+        uint256 currentMultiSigSignersLength = currentMultiSigSigners.length;
+
+        for (uint256 i = 0; i < currentMultiSigSignersLength;) {
             multiSigSigners[currentMultiSigSigners[i]] = false;
+
+            unchecked {
+                ++i;
+            }
         }
 
-        for (uint256 i = 0; i < _signers.length; i++) {
+        uint256 signersArrayLength = _signers.length;
+
+        for (uint256 i = 0; i < signersArrayLength;) {
             multiSigSigners[_signers[i]] = true;
+
+            unchecked {
+                ++i;
+            }
         }
 
         currentMultiSigSigners = _signers;
@@ -237,7 +255,7 @@ contract VaultMultisig {
         if (transfer.executed) revert TransferIsAlreadyExecuted(_transferId);
         if (transfer.approved[msg.sender]) revert SignerAlreadyApproved(msg.sender);
 
-        transfer.approvals++;
+        ++transfer.approvals;
         transfer.approved[msg.sender] = true;
 
         emit TransferApproved(_transferId, msg.sender);

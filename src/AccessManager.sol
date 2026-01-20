@@ -8,7 +8,7 @@ contract AccessManager is AccessControl {
     using Roles for bytes32;
 
     /// @dev Initializes the contract setting the deployer as the initial admin.
-    constructor() {
+    constructor() payable {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
 
         // Set role admin relationships
